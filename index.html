@@ -39,12 +39,33 @@
                         const canvas = document.getElementById('imageCanvas');
                         const ctx = canvas.getContext('2d');
 
-                        // Set canvas size to match the image size
-                        canvas.width = originalImage.width;
-                        canvas.height = originalImage.height;
+                        // Determine the canvas size to fit all four images
+                        canvas.width = originalImage.width * 2;
+                        canvas.height = originalImage.height * 2;
 
-                        // Draw the original image
+                        // Original image
                         ctx.drawImage(originalImage, 0, 0);
+
+                        // 90 degrees rotated
+                        ctx.save();
+                        ctx.translate(originalImage.width, 0);
+                        ctx.rotate(Math.PI / 2);
+                        ctx.drawImage(originalImage, 0, -originalImage.width);
+                        ctx.restore();
+
+                        // 180 degrees rotated
+                        ctx.save();
+                        ctx.translate(originalImage.width, originalImage.height);
+                        ctx.rotate(Math.PI);
+                        ctx.drawImage(originalImage, -originalImage.width, -originalImage.height);
+                        ctx.restore();
+
+                        // 270 degrees rotated
+                        ctx.save();
+                        ctx.translate(0, originalImage.height);
+                        ctx.rotate(-Math.PI / 2);
+                        ctx.drawImage(originalImage, -originalImage.height, 0);
+                        ctx.restore();
                     };
                     originalImage.src = e.target.result;
                 };
