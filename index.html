@@ -3,14 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Imr</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Image Processor</title>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        #imageCanvas {
+            border: 1px solid black; /* Optional, for visibility */
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <input type="file" id="imageInput" accept="image/*">
         <canvas id="imageCanvas"></canvas>
     </div>
-    <script src="script.js"></script>
+    <script>
+        document.getElementById('imageInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const originalImage = new Image();
+                    originalImage.onload = function() {
+                        const canvas = document.getElementById('imageCanvas');
+                        const ctx = canvas.getContext('2d');
+
+                        // Set canvas size to match the image size
+                        canvas.width = originalImage.width;
+                        canvas.height = originalImage.height;
+
+                        // Draw the original image
+                        ctx.drawImage(originalImage, 0, 0);
+                    };
+                    originalImage.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
 </body>
 </html>
