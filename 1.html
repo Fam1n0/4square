@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Processor</title>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        #imageCanvas {
+            border: 1px solid black; /* Optional, for visibility */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <input type="file" id="imageInput" accept="image/*">
+        <canvas id="imageCanvas"></canvas>
+    </div>
+    <script>
+        document.getElementById('imageInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const originalImage = new Image();
+                    originalImage.onload = function() {
+                        const canvas = document.getElementById('imageCanvas');
+                        const ctx = canvas.getContext('2d');
+                        // Clear the canvas
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                        // Set the canvas size to be the sum of the original image's width and height
+                        canvas.width = originalImage.width + originalImage.height;
+                        canvas.height = originalImage.width + originalImage.height;
+
+                        // Draw the original image in the top left corner
+                        ctx.drawImage(originalImage, 0, 0);
+
+                        // Draw the image rotated 90 degrees in the top right corner
+                        ctx.save();
+                        ctx.translate(originalImage.width, 0);
+                        ctx.rotate(Math.PI / 2);
+                        ctx.drawImage(originalImage, 0, -originalImage.height);
+                        ctx.restore();
+
+                        // Draw the image rotated 180 degrees in the bottom right corner
+                        ctx.save();
+                        ctx.translate(originalImage.width, originalImage.height);
+                        ctx.rotate(Math.PI);
+                        ctx.drawImage(originalImage, -originalImage.width, -originalImage.height);
+                        ctx.restore();
+
+                        // Draw the image rotated 270 degrees in the bottom left corner
+                        ctx.save();
+                        ctx.translate(0, originalImage.height);
+                        ctx.rotate(-Math.PI / 2);
+                        ctx.drawImage(originalImage, -originalImage.width, 0);
+                        ctx.restore();
+                    };
+                    originalImage.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+</body>
+</html>
