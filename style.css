@@ -12,12 +12,14 @@ body, html {
 }
 
 #imageContainer {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-gap: 0;
+    display: flex;
+    flex-wrap: wrap;
+    width: 400px; /* Adjust based on desired size */
+    height: 400px;
 }
 
 #imageContainer img {
-    width: 100%;
-    height: auto;
+    width: 50%; /* Each image takes up half the container's width */
+    height: 50%; /* Each image takes up half the container's height */
+    object-fit: cover;
 }
