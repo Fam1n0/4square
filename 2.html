@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ImR</title>
+    <style>
+        body, html {
+            margin: 0;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            text-align: center;
+        }
+        #combinedCanvas {
+            border: 1px solid black;
+            max-width: 100%;
+            max-height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <input type="file" id="imageInput" accept="image/*">
+        <canvas id="combinedCanvas"></canvas>
+    </div>
+    <script>
+        document.getElementById('imageInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const originalImage = new Image();
+                    originalImage.onload = function() {
+                        const combinedCanvas = document.getElementById('combinedCanvas');
+                        const ctx = combinedCanvas.getContext('2d');
+
+                        // Set the canvas dimensions to fit the uploaded image
+                        combinedCanvas.width = originalImage.width * 2;
+                        combinedCanvas.height = originalImage.height * 2;
+
+                        // Clear the canvas
+                        ctx.clearRect(0, 0, combinedCanvas.width, combinedCanvas.height);
+
+                        // Draw the original image
+                        ctx.drawImage(originalImage, 0, 0, originalImage.width, originalImage.height);
+
+                        // Rotate and draw the image 90 degrees clockwise
+                        ctx.save();
+                        ctx.translate(originalImage.width, 0);
+                        ctx.rotate(Math.PI / 2);
+                        ctx.drawImage(originalImage, 0, 0, originalImage.width, originalImage.height);
+                        ctx.restore();
+
+                        // Rotate and draw the image 180 degrees clockwise
+                        ctx.save();
+                        ctx.translate(originalImage.width, originalImage.height);
+                        ctx.rotate(Math.PI);
+                        ctx.drawImage(originalImage, 0, 0, originalImage.width, originalImage.height);
+                        ctx.restore();
+
+                        // Rotate and draw the image 270 degrees clockwise
+                        ctx.save();
+                        ctx.translate(0, originalImage.height);
+                        ctx.rotate(-Math.PI / 2);
+                        ctx.drawImage(originalImage, 0, 0, originalImage.width, originalImage.height);
+                        ctx.restore();
+                    };
+                    originalImage.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+</body>
+</html>
