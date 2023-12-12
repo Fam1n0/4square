@@ -20,8 +20,6 @@
 
         #imageCanvas {
             border: 1px solid black; /* Optional, for visibility */
-            max-width: 90vw; /* Limit the canvas size to the viewport width */
-            max-height: 90vh; /* Limit the canvas size to the viewport height */
         }
     </style>
 </head>
@@ -52,22 +50,22 @@
 
                         // Draw the image rotated 90 degrees in the top right corner
                         ctx.save();
-                        ctx.translate(canvas.width, 0);
-                        ctx.rotate(90 * Math.PI / 180);
-                        ctx.drawImage(originalImage, 0, 0);
+                        ctx.translate(originalImage.width, 0);
+                        ctx.rotate(Math.PI / 2);
+                        ctx.drawImage(originalImage, 0, -originalImage.height);
                         ctx.restore();
 
                         // Draw the image rotated 180 degrees in the bottom right corner
                         ctx.save();
-                        ctx.translate(canvas.width, canvas.height);
-                        ctx.rotate(180 * Math.PI / 180);
+                        ctx.translate(originalImage.width, originalImage.height);
+                        ctx.rotate(Math.PI);
                         ctx.drawImage(originalImage, -originalImage.width, -originalImage.height);
                         ctx.restore();
 
                         // Draw the image rotated 270 degrees in the bottom left corner
                         ctx.save();
-                        ctx.translate(0, canvas.height);
-                        ctx.rotate(270 * Math.PI / 180);
+                        ctx.translate(0, originalImage.height);
+                        ctx.rotate(-Math.PI / 2);
                         ctx.drawImage(originalImage, -originalImage.width, 0);
                         ctx.restore();
                     };
