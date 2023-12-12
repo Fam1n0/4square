@@ -5,30 +5,39 @@ document.getElementById('imageInput').addEventListener('change', function(event)
         reader.onload = function(e) {
             const originalImage = new Image();
             originalImage.onload = function() {
-                const imageContainer = document.getElementById('imageContainer');
-                imageContainer.innerHTML = '';
+                const canvas = document.getElementById('imageCanvas');
+                const ctx = canvas.getContext('2d');
+
+                const size = Math.max(originalImage.width, originalImage.height);
+                canvas.width = size * 2;
+                canvas.height = size * 2;
 
                 // Original image
-                imageContainer.appendChild(createRotatedImage(originalImage.src, 0));
+                ctx.drawImage(originalImage, 0, 0, size, size);
 
                 // 90 degrees rotated
-                imageContainer.appendChild(createRotatedImage(originalImage.src, 90));
+                ctx.save();
+                ctx.translate(size * 2, 0);
+                ctx.rotate(Math.PI / 2);
+                ctx.drawImage(originalImage, 0, 0, size, size);
+                ctx.restore();
 
                 // 180 degrees rotated
-                imageContainer.appendChild(createRotatedImage(originalImage.src, 180));
+                ctx.save();
+                ctx.translate(size * 2, size * 2);
+                ctx.rotate(Math.PI);
+                ctx.drawImage(originalImage, 0, 0, size, size);
+                ctx.restore();
 
                 // 270 degrees rotated
-                imageContainer.appendChild(createRotatedImage(originalImage.src, 270));
+                ctx.save();
+                ctx.translate(0, size * 2);
+                ctx.rotate(-Math.PI / 2);
+                ctx.drawImage(originalImage, 0, 0, size, size);
+                ctx.restore();
             };
             originalImage.src = e.target.result;
         };
         reader.readAsDataURL(file);
     }
 });
-
-function createRotatedImage(src, rotation) {
-    const img = document.createElement('img');
-    img.src = src;
-    img.style.transform = `rotate(${rotation}deg)`;
-    return img;
-}
