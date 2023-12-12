@@ -3,28 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ImR5</title>
+    <title>Image Processor</title>
     <style>
-    body, html {
-        margin: 0;
-        height: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-family: Arial, sans-serif;
-        background-color: black; /* Set the background color to black */
-        color: white; /* Optional: Change text color to white for better visibility */
-    }
-    .container {
-        text-align: center;
-    }
-    #combinedCanvas {
-        border: 1px solid black;
-        max-width: 100%;
-        max-height: 100%;
-    }
-</style>
-
+        body, html {
+            margin: 0;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            background-color: black; /* Black background */
+            color: white; /* White text color for visibility */
+        }
+        .container {
+            text-align: center;
+        }
+        #combinedCanvas {
+            border: 1px solid black;
+            max-width: 100%;
+            max-height: 100%;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -43,32 +42,26 @@
                         const combinedCanvas = document.getElementById('combinedCanvas');
                         const ctx = combinedCanvas.getContext('2d');
 
-                        combinedCanvas.width = originalImage.width * 2;
-                        combinedCanvas.height = originalImage.height * 2;
+                        let scaleFactor = 1;
+                        const maxDimension = 800;
+                        if (originalImage.width > maxDimension || originalImage.height > maxDimension) {
+                            scaleFactor = Math.min(maxDimension / originalImage.width, maxDimension / originalImage.height);
+                        }
 
-                        // Draw the original image
-                        ctx.drawImage(originalImage, 0, 0);
+                        combinedCanvas.width = originalImage.width * scaleFactor * 2;
+                        combinedCanvas.height = originalImage.height * scaleFactor * 2;
 
-                        // Rotate and draw the image 90 degrees clockwise
-                        ctx.save();
+                        ctx.drawImage(originalImage, 0, 0, originalImage.width * scaleFactor, originalImage.height * scaleFactor);
                         ctx.translate(combinedCanvas.width, 0);
                         ctx.rotate(Math.PI / 2);
-                        ctx.drawImage(originalImage, 0, 0);
-                        ctx.restore();
-
-                        // Rotate and draw the image 180 degrees clockwise
-                        ctx.save();
-                        ctx.translate(combinedCanvas.width, combinedCanvas.height);
-                        ctx.rotate(Math.PI);
-                        ctx.drawImage(originalImage, 0, 0);
-                        ctx.restore();
-
-                        // Rotate and draw the image 270 degrees clockwise
-                        ctx.save();
+                        ctx.drawImage(originalImage, 0, -originalImage.height * scaleFactor, originalImage.width * scaleFactor, originalImage.height * scaleFactor);
+                        ctx.rotate(Math.PI / 2);
+                        ctx.translate(-combinedCanvas.width, -combinedCanvas.height);
+                        ctx.drawImage(originalImage, -originalImage.width * scaleFactor, 0, originalImage.width * scaleFactor, originalImage.height * scaleFactor);
+                        ctx.rotate(Math.PI / 2);
                         ctx.translate(0, combinedCanvas.height);
-                        ctx.rotate(-Math.PI / 2);
-                        ctx.drawImage(originalImage, 0, 0);
-                        ctx.restore();
+                        ctx.drawImage(originalImage, 0, 0, originalImage.width * scaleFactor, originalImage.height * scaleFactor);
+                        ctx.setTransform(1, 0, 0, 1, 0, 0);
                     };
                     originalImage.src = e.target.result;
                 };
@@ -79,8 +72,6 @@
         document.getElementById('saveButton').addEventListener('click', function() {
             const combinedCanvas = document.getElementById('combinedCanvas');
             const image = combinedCanvas.toDataURL("image/png");
-
-            // Generate a unique filename using date and time
             const now = new Date();
             const timestamp = now.getFullYear().toString() + 
                               (now.getMonth() + 1).toString().padStart(2, '0') + 
@@ -90,8 +81,6 @@
                               now.getSeconds().toString().padStart(2, '0') + 
                               now.getMilliseconds().toString().padStart(3, '0');
             const filename = `processed_image_${timestamp}.png`;
-
-            // Create a link and trigger the download
             const link = document.createElement('a');
             link.download = filename;
             link.href = image;
