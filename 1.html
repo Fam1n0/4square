@@ -2,9 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Processor</title>
+    <title>Image Viewer</title>
     <style>
         body, html {
             margin: 0;
@@ -12,48 +11,35 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: auto; /* Adds scrollbars if content is larger than the screen */
+            overflow: auto;
             font-family: Arial, sans-serif;
         }
-        #imageContainer {
+        .container {
+            width: 100vw;
+            height: 100vh;
             position: relative;
-            width: 300%; /* 3 times the image width assuming the image is square */
-            height: 300%; /* 3 times the image height assuming the image is square */
         }
         .image {
             position: absolute;
-            width: 33.333%; /* One third of the container */
-            height: 33.333%; /* One third of the container */
+            max-width: 33.333%;
+            max-height: 33.333%;
+            object-fit: contain;
         }
-        #imageOriginal {
-            top: 33.333%;
-            left: 33.333%;
-        }
-        #image90 {
-            top: 33.333%;
-            right: 0;
-            transform: rotate(90deg);
-        }
-        #image180 {
-            bottom: 0;
-            left: 33.333%;
-            transform: rotate(180deg);
-        }
-        #image270 {
-            bottom: 0;
-            right: 0;
-            transform: rotate(270deg);
-        }
+        #imageOriginal { top: 0; left: 33.333%; }
+        #image90 { top: 0; right: 0; transform: rotate(90deg); transform-origin: top left; }
+        #image180 { bottom: 0; left: 33.333%; transform: rotate(180deg); transform-origin: top left; }
+        #image270 { bottom: 0; right: 0; transform: rotate(270deg); transform-origin: top left; }
+        #imageInput { position: absolute; top: 10px; left: 10px; z-index: 10; }
     </style>
 </head>
 <body>
-    <div id="imageContainer">
+    <div class="container">
+        <input type="file" id="imageInput" accept="image/*">
         <img id="imageOriginal" class="image" src="" alt="Original Image">
         <img id="image90" class="image" src="" alt="90 Degree Rotated Image">
         <img id="image180" class="image" src="" alt="180 Degree Rotated Image">
         <img id="image270" class="image" src="" alt="270 Degree Rotated Image">
     </div>
-    <input type="file" id="imageInput" accept="image/*">
     <script>
         document.getElementById('imageInput').addEventListener('change', function(event) {
             const file = event.target.files[0];
