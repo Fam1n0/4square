@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Fractal Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+</head>
+<body>
+    <div id="uploadDiv">
+        <!-- Image upload input will be created here by p5.js -->
+    </div>
+    <canvas id="fractalCanvas"></canvas>
+    <script>
+        let uploadedImage;
+        let fractalCanvas;
+
+        function setup() {
+            createCanvas(400, 400); // Set canvas size as needed
+            let imageInput = createFileInput(handleFile);
+            imageInput.parent('uploadDiv'); // Create a parent div in your HTML for the input
+            fractalCanvas = createGraphics(width, height);
+        }
+
+        function handleFile(file) {
+            if (file.type === 'image') {
+                uploadedImage = loadImage(file.data, function() {
+                    generateFractal();
+                });
+            } else {
+                alert('Please upload an image file.');
+            }
+        }
+
+        function generateFractal() {
+            // Use p5.js functions and libraries to create your random fractal pattern
+            fractalCanvas.background(255); // Clear canvas
+            fractalCanvas.image(uploadedImage, 0, 0, width, height); // Display the uploaded image
+
+            // You can use p5.js functions like random() or noise() to modify the image or create fractal effects
+
+            // Display the fractal pattern on the canvas
+            image(fractalCanvas, 0, 0);
+        }
+    </script>
+</body>
+</html>
