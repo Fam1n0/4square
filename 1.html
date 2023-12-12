@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Image Processor</title>
     <style>
@@ -13,18 +14,12 @@
             align-items: center;
             font-family: Arial, sans-serif;
         }
-
         .container {
+            position: relative;
             text-align: center;
         }
-
         #imageCanvas {
             border: 1px solid black; /* Optional, for visibility */
-            /* Limit the canvas size to the viewport, maintaining aspect ratio */
-            max-width: 90vw;
-            max-height: 90vh;
-            width: auto;
-            height: auto;
         }
     </style>
 </head>
@@ -43,41 +38,33 @@
                     originalImage.onload = function() {
                         const canvas = document.getElementById('imageCanvas');
                         const ctx = canvas.getContext('2d');
-                        // Clear the canvas
-                        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                        // Calculate the required size for the canvas
-                        const maxDimension = Math.max(originalImage.width, originalImage.height);
-                        const minDimension = Math.min(originalImage.width, originalImage.height);
-                        canvas.width = maxDimension + minDimension;
-                        canvas.height = maxDimension + minDimension;
+                        // Set the canvas dimensions to be large enough to fit all rotations
+                        canvas.width = originalImage.width + originalImage.height;
+                        canvas.height = canvas.width; // Square canvas to fit all rotations
 
-                        // Calculate the offsets for centering the images
-                        const xOffset = (canvas.width - originalImage.width) / 2;
-                        const yOffset = (canvas.height - originalImage.height) / 2;
+                        // Draw the original image in the top-left corner
+                        ctx.drawImage(originalImage, 0, 0);
 
-                        // Original image, centered
-                        ctx.drawImage(originalImage, xOffset, yOffset);
-
-                        // 90 degrees rotated, centered on the right
+                        // Draw the image rotated 90 degrees in the top-right corner
                         ctx.save();
-                        ctx.translate(canvas.width / 2, canvas.height / 2);
+                        ctx.translate(originalImage.width + originalImage.height, 0);
                         ctx.rotate(Math.PI / 2);
-                        ctx.drawImage(originalImage, minDimension / 2, -maxDimension / 2);
+                        ctx.drawImage(originalImage, 0, -originalImage.width);
                         ctx.restore();
 
-                        // 180 degrees rotated, centered at the bottom
+                        // Draw the image rotated 180 degrees in the bottom-right corner
                         ctx.save();
-                        ctx.translate(canvas.width / 2, canvas.height / 2);
+                        ctx.translate(originalImage.width + originalImage.height, originalImage.width);
                         ctx.rotate(Math.PI);
-                        ctx.drawImage(originalImage, -maxDimension / 2, -minDimension / 2);
+                        ctx.drawImage(originalImage, -originalImage.height, -originalImage.width);
                         ctx.restore();
 
-                        // 270 degrees rotated, centered on the left
+                        // Draw the image rotated 270 degrees in the bottom-left corner
                         ctx.save();
-                        ctx.translate(canvas.width / 2, canvas.height / 2);
+                        ctx.translate(0, originalImage.width);
                         ctx.rotate(-Math.PI / 2);
-                        ctx.drawImage(originalImage, -minDimension / 2, maxDimension / 2);
+                        ctx.drawImage(originalImage, -originalImage.height, 0);
                         ctx.restore();
                     };
                     originalImage.src = e.target.result;
