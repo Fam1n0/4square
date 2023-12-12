@@ -11,15 +11,6 @@ body, html {
     text-align: center;
 }
 
-#imageContainer {
-    display: flex;
-    flex-wrap: wrap;
-    width: 400px; /* Adjust based on desired size */
-    height: 400px;
-}
-
-#imageContainer img {
-    width: 50%; /* Each image takes up half the container's width */
-    height: 50%; /* Each image takes up half the container's height */
-    object-fit: cover;
+#imageCanvas {
+    border: 1px solid black; /* Optional, for visibility */
 }
