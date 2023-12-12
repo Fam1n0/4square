@@ -20,6 +20,11 @@
 
         #imageCanvas {
             border: 1px solid black; /* Optional, for visibility */
+            /* Limit the canvas size to the viewport, maintaining aspect ratio */
+            max-width: 90vw;
+            max-height: 90vh;
+            width: auto;
+            height: auto;
         }
     </style>
 </head>
@@ -41,32 +46,38 @@
                         // Clear the canvas
                         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                        // Set the canvas size to be the sum of the original image's width and height
-                        canvas.width = originalImage.width + originalImage.height;
-                        canvas.height = originalImage.width + originalImage.height;
+                        // Calculate the required size for the canvas
+                        const maxDimension = Math.max(originalImage.width, originalImage.height);
+                        const minDimension = Math.min(originalImage.width, originalImage.height);
+                        canvas.width = maxDimension + minDimension;
+                        canvas.height = maxDimension + minDimension;
 
-                        // Draw the original image in the top left corner
-                        ctx.drawImage(originalImage, 0, 0);
+                        // Calculate the offsets for centering the images
+                        const xOffset = (canvas.width - originalImage.width) / 2;
+                        const yOffset = (canvas.height - originalImage.height) / 2;
 
-                        // Draw the image rotated 90 degrees in the top right corner
+                        // Original image, centered
+                        ctx.drawImage(originalImage, xOffset, yOffset);
+
+                        // 90 degrees rotated, centered on the right
                         ctx.save();
-                        ctx.translate(originalImage.width, 0);
+                        ctx.translate(canvas.width / 2, canvas.height / 2);
                         ctx.rotate(Math.PI / 2);
-                        ctx.drawImage(originalImage, 0, -originalImage.height);
+                        ctx.drawImage(originalImage, minDimension / 2, -maxDimension / 2);
                         ctx.restore();
 
-                        // Draw the image rotated 180 degrees in the bottom right corner
+                        // 180 degrees rotated, centered at the bottom
                         ctx.save();
-                        ctx.translate(originalImage.width, originalImage.height);
+                        ctx.translate(canvas.width / 2, canvas.height / 2);
                         ctx.rotate(Math.PI);
-                        ctx.drawImage(originalImage, -originalImage.width, -originalImage.height);
+                        ctx.drawImage(originalImage, -maxDimension / 2, -minDimension / 2);
                         ctx.restore();
 
-                        // Draw the image rotated 270 degrees in the bottom left corner
+                        // 270 degrees rotated, centered on the left
                         ctx.save();
-                        ctx.translate(0, originalImage.height);
+                        ctx.translate(canvas.width / 2, canvas.height / 2);
                         ctx.rotate(-Math.PI / 2);
-                        ctx.drawImage(originalImage, -originalImage.width, 0);
+                        ctx.drawImage(originalImage, -minDimension / 2, maxDimension / 2);
                         ctx.restore();
                     };
                     originalImage.src = e.target.result;
