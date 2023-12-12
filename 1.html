@@ -7,69 +7,62 @@
     <title>Image Processor</title>
     <style>
         body, html {
-            height: 100%;
             margin: 0;
+            height: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
+            overflow: auto; /* Adds scrollbars if content is larger than the screen */
             font-family: Arial, sans-serif;
         }
-        .container {
+        #imageContainer {
             position: relative;
-            text-align: center;
+            width: 300%; /* 3 times the image width assuming the image is square */
+            height: 300%; /* 3 times the image height assuming the image is square */
         }
-        #imageCanvas {
-            border: 1px solid black; /* Optional, for visibility */
+        .image {
+            position: absolute;
+            width: 33.333%; /* One third of the container */
+            height: 33.333%; /* One third of the container */
+        }
+        #imageOriginal {
+            top: 33.333%;
+            left: 33.333%;
+        }
+        #image90 {
+            top: 33.333%;
+            right: 0;
+            transform: rotate(90deg);
+        }
+        #image180 {
+            bottom: 0;
+            left: 33.333%;
+            transform: rotate(180deg);
+        }
+        #image270 {
+            bottom: 0;
+            right: 0;
+            transform: rotate(270deg);
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <input type="file" id="imageInput" accept="image/*">
-        <canvas id="imageCanvas"></canvas>
+    <div id="imageContainer">
+        <img id="imageOriginal" class="image" src="" alt="Original Image">
+        <img id="image90" class="image" src="" alt="90 Degree Rotated Image">
+        <img id="image180" class="image" src="" alt="180 Degree Rotated Image">
+        <img id="image270" class="image" src="" alt="270 Degree Rotated Image">
     </div>
+    <input type="file" id="imageInput" accept="image/*">
     <script>
         document.getElementById('imageInput').addEventListener('change', function(event) {
             const file = event.target.files[0];
             if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const originalImage = new Image();
-                    originalImage.onload = function() {
-                        const canvas = document.getElementById('imageCanvas');
-                        const ctx = canvas.getContext('2d');
-
-                        // Set the canvas dimensions to be large enough to fit all rotations
-                        canvas.width = originalImage.width + originalImage.height;
-                        canvas.height = canvas.width; // Square canvas to fit all rotations
-
-                        // Draw the original image in the top-left corner
-                        ctx.drawImage(originalImage, 0, 0);
-
-                        // Draw the image rotated 90 degrees in the top-right corner
-                        ctx.save();
-                        ctx.translate(originalImage.width + originalImage.height, 0);
-                        ctx.rotate(Math.PI / 2);
-                        ctx.drawImage(originalImage, 0, -originalImage.width);
-                        ctx.restore();
-
-                        // Draw the image rotated 180 degrees in the bottom-right corner
-                        ctx.save();
-                        ctx.translate(originalImage.width + originalImage.height, originalImage.width);
-                        ctx.rotate(Math.PI);
-                        ctx.drawImage(originalImage, -originalImage.height, -originalImage.width);
-                        ctx.restore();
-
-                        // Draw the image rotated 270 degrees in the bottom-left corner
-                        ctx.save();
-                        ctx.translate(0, originalImage.width);
-                        ctx.rotate(-Math.PI / 2);
-                        ctx.drawImage(originalImage, -originalImage.height, 0);
-                        ctx.restore();
-                    };
-                    originalImage.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
+                const url = URL.createObjectURL(file);
+                document.getElementById('imageOriginal').src = url;
+                document.getElementById('image90').src = url;
+                document.getElementById('image180').src = url;
+                document.getElementById('image270').src = url;
             }
         });
     </script>
