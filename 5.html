@@ -42,31 +42,26 @@
                         const combinedCanvas = document.getElementById('combinedCanvas');
                         const ctx = combinedCanvas.getContext('2d');
 
-                        combinedCanvas.width = originalImage.width * 2;
-                        combinedCanvas.height = originalImage.height * 2;
+                        const scaleFactor = 0.5; // Scale down the image by 50%
+                        combinedCanvas.width = originalImage.width * scaleFactor * 2;
+                        combinedCanvas.height = originalImage.height * scaleFactor * 2;
 
-                        // Draw the original image
-                        ctx.drawImage(originalImage, 0, 0);
-
-                        // Rotate and draw the image 90 degrees clockwise
+                        // Draw and rotate the original image at different angles
+                        ctx.drawImage(originalImage, 0, 0, originalImage.width * scaleFactor, originalImage.height * scaleFactor);
                         ctx.save();
                         ctx.translate(combinedCanvas.width, 0);
                         ctx.rotate(Math.PI / 2);
-                        ctx.drawImage(originalImage, 0, 0);
+                        ctx.drawImage(originalImage, 0, 0, originalImage.width * scaleFactor, originalImage.height * scaleFactor);
                         ctx.restore();
-
-                        // Rotate and draw the image 180 degrees clockwise
                         ctx.save();
                         ctx.translate(combinedCanvas.width, combinedCanvas.height);
                         ctx.rotate(Math.PI);
-                        ctx.drawImage(originalImage, 0, 0);
+                        ctx.drawImage(originalImage, 0, 0, originalImage.width * scaleFactor, originalImage.height * scaleFactor);
                         ctx.restore();
-
-                        // Rotate and draw the image 270 degrees clockwise
                         ctx.save();
                         ctx.translate(0, combinedCanvas.height);
                         ctx.rotate(-Math.PI / 2);
-                        ctx.drawImage(originalImage, 0, 0);
+                        ctx.drawImage(originalImage, 0, 0, originalImage.width * scaleFactor, originalImage.height * scaleFactor);
                         ctx.restore();
                     };
                     originalImage.src = e.target.result;
@@ -77,11 +72,9 @@
 
         document.getElementById('saveButton').addEventListener('click', function() {
             const combinedCanvas = document.getElementById('combinedCanvas');
-            
-            // Use JPEG format and set quality to 0.8 for a good balance between quality and file size
-            const image = combinedCanvas.toDataURL("image/jpeg", 0.8);
+            const quality = 0.6; // Adjust the quality setting for JPEG
+            const image = combinedCanvas.toDataURL("image/jpeg", quality);
 
-            // Generate a unique filename using date and time
             const now = new Date();
             const timestamp = now.getFullYear().toString() + 
                               (now.getMonth() + 1).toString().padStart(2, '0') + 
@@ -90,9 +83,8 @@
                               now.getMinutes().toString().padStart(2, '0') + 
                               now.getSeconds().toString().padStart(2, '0') + 
                               now.getMilliseconds().toString().padStart(3, '0');
-            const filename = `processed_image_${timestamp}.jpg`; // Change the extension to .jpg
+            const filename = `processed_image_${timestamp}.jpg`;
 
-            // Create a link and trigger the download
             const link = document.createElement('a');
             link.download = filename;
             link.href = image;
