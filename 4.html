@@ -2,102 +2,99 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Editor</title>
+    <title>Image Editor with Fabric.js</title>
     <style>
-    body, html {
-        margin: 0;
-        height: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-family: Arial, sans-serif;
-        background-color: black;
-        color: white;
-    }
-    .container {
-        text-align: center;
-    }
-    #combinedCanvas {
-        border: 1px solid black;
-        max-width: 100%;
-        max-height: 100%;
-    }
-    .slider {
-        width: 300px;
-    }
+        body, html {
+            margin: 0;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            background-color: black;
+            color: white;
+        }
+        .container {
+            text-align: center;
+        }
+        canvas {
+            border: 1px solid black;
+            max-width: 100%;
+            max-height: 100%;
+        }
+        .slider {
+            width: 300px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <input type="file" id="imageInput" accept="image/*"><br><br>
-
-        Brightness: <input type="range" id="brightness" class="slider" min="0" max="200" value="100"><br>
-        Contrast: <input type="range" id="contrast" class="slider" min="0" max="200" value="100"><br>
-        Saturation: <input type="range" id="saturation" class="slider" min="0" max="200" value="100"><br>
-        Hue: <input type="range" id="hue" class="slider" min="0" max="360" value="0"><br>
-
+        Brightness: <input type="range" id="brightness" class="slider" min="-100" max="100" value="0"><br>
+        Contrast: <input type="range" id="contrast" class="slider" min="-100" max="100" value="0"><br>
+        Saturation: <input type="range" id="saturation" class="slider" min="-100" max="100" value="0"><br>
         <button id="applyFilters">Apply Filters</button>
         <button id="saveButton">Save Image</button><br><br>
-
-        <canvas id="combinedCanvas"></canvas>
+        <canvas id="combinedCanvas" width="800" height="600"></canvas>
     </div>
-    <script>
-        let originalImage = null;
 
-        document.getElementById('imageInput').addEventListener('change', function(event) {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.5.0/fabric.min.js"></script>
+    <script>
+        let canvas = new fabric.Canvas('combinedCanvas');
+        let fImage;
+
+        document.getElementById('imageInput').addEventListener('change', function (event) {
             const file = event.target.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
-                    originalImage = new Image();
-                    originalImage.onload = resetCanvas;
-                    originalImage.src = e.target.result;
+                reader.onload = function (e) {
+                    fabric.Image.fromURL(e.target.result, function (oImg) {
+                        canvas.clear();
+                        fImage = oImg;
+                        fImage.set({ left: 50, top: 50, angle: 0 });
+                        canvas.add(fImage);
+                        canvas.renderAll();
+                    });
                 };
                 reader.readAsDataURL(file);
             }
         });
 
-        document.getElementById('applyFilters').addEventListener('click', function() {
-            const brightness = document.getElementById('brightness').value;
-            const contrast = document.getElementById('contrast').value;
-            const saturation = document.getElementById('saturation').value;
-            const hue = document.getElementById('hue').value;
+        document.getElementById('applyFilters').addEventListener('click', function () {
+            const brightnessVal = parseFloat(document.getElementById('brightness').value);
+            const contrastVal = parseFloat(document.getElementById('contrast').value);
+            const saturationVal = parseFloat(document.getElementById('saturation').value);
 
-            applyFilters(brightness, contrast, saturation, hue);
+            fImage.filters = [
+                new fabric.Image.filters.Brightness({ brightness: brightnessVal }),
+                new fabric.Image.filters.Contrast({ contrast: contrastVal }),
+                new fabric.Image.filters.Saturation({ saturation: saturationVal })
+            ];
+            
+            fImage.applyFilters();
+            canvas.renderAll();
         });
 
-        function resetCanvas() {
-            const canvas = document.getElementById('combinedCanvas');
-            canvas.width = originalImage.width;
-            canvas.height = originalImage.height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(originalImage, 0, 0);
-        }
+        document.getElementById('saveButton').addEventListener('click', function () {
+            const image = canvas.toDataURL({
+                format: 'jpeg',
+                quality: 0.8
+            });
 
-        function applyFilters(brightness, contrast, saturation, hue) {
-            // This function should apply the filters to the canvas
-            // For simplicity, this function will need to be implemented
-            // with appropriate image processing algorithms
-            const canvas = document.getElementById('combinedCanvas');
-            const ctx = canvas.getContext('2d');
-            ctx.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%) hue-rotate(${hue}deg)`;
-            ctx.drawImage(originalImage, 0, 0);
-        }
-
-        document.getElementById('saveButton').addEventListener('click', function() {
-            const canvas = document.getElementById('combinedCanvas');
-            const image = canvas.toDataURL("image/jpeg", 0.8);
+            // Generate a unique filename using date and time
             const now = new Date();
-            const timestamp = now.getFullYear().toString() + 
-                              (now.getMonth() + 1).toString().padStart(2, '0') + 
-                              now.getDate().toString().padStart(2, '0') + '_' + 
-                              now.getHours().toString().padStart(2, '0') + 
-                              now.getMinutes().toString().padStart(2, '0') + 
-                              now.getSeconds().toString().padStart(2, '0') + 
+            const timestamp = now.getFullYear().toString() +
+                              (now.getMonth() + 1).toString().padStart(2, '0') +
+                              now.getDate().toString().padStart(2, '0') + '_' +
+                              now.getHours().toString().padStart(2, '0') +
+                              now.getMinutes().toString().padStart(2, '0') +
+                              now.getSeconds().toString().padStart(2, '0') +
                               now.getMilliseconds().toString().padStart(3, '0');
-            const filename = `processed_image_${timestamp}.jpg`;
+            const filename = `edited_image_${timestamp}.jpg`;
 
+            // Create a link and trigger the download
             const link = document.createElement('a');
             link.download = filename;
             link.href = image;
