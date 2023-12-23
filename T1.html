@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ImR5</title>
+    <style>
+        body, html {
+            margin: 0;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            background-color: black;
+            color: white;
+        }
+        .container {
+            text-align: center;
+            flex-direction: column;
+        }
+        .spiral-layout {
+            position: relative;
+            width: 600px; /* Adjust as needed */
+            height: 600px; /* Adjust as needed */
+            margin: auto;
+        }
+        .section {
+            position: absolute;
+            width: 100px; /* Adjust as needed */
+            height: 100px; /* Adjust as needed */
+            /* Additional styling */
+        }
+        #section1 { top: 50%; left: 50%; }
+        #section2 { top: 50%; left: 30%; }
+        #section3 { top: 30%; left: 30%; }
+        #section4 { top: 30%; left: 50%; }
+        #section5 { top: 30%; left: 70%; }
+        #section6 { top: 50%; left: 70%; }
+        #section7 { top: 70%; left: 70%; }
+        #section8 { top: 70%; left: 50%; }
+        #section9 { top: 70%; left: 30%; }
+        /* Position remaining sections in spiral pattern */
+
+        #combinedCanvas {
+            border: 1px solid black;
+            max-width: 100%;
+            max-height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Spiral layout container -->
+        <div class="spiral-layout">
+            <!-- Nine sections -->
+            <div class="section" id="section1"><canvas id="combinedCanvas"></canvas></div>
+            <div class="section" id="section2"></div>
+            <div class="section" id="section3"></div>
+            <div class="section" id="section4"></div>
+            <div class="section" id="section5"></div>
+            <div class="section" id="section6"></div>
+            <div class="section" id="section7"></div>
+            <div class="section" id="section8"></div>
+            <div class="section" id="section9"></div>
+        </div>
+        <input type="file" id="imageInput" accept="image/*">
+        <button id="saveButton">Save Image</button>
+    </div>
+    <script>
+        document.getElementById('imageInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const originalImage = new Image();
+                    originalImage.onload = function() {
+                        const combinedCanvas = document.getElementById('combinedCanvas');
+                        const ctx = combinedCanvas.getContext('2d');
+
+                        combinedCanvas.width = originalImage.width * 2;
+                        combinedCanvas.height = originalImage.height * 2;
+
+                        // Draw the original image
+                        ctx.drawImage(originalImage, 0, 0);
+
+                        // Rotate and draw the image 90 degrees clockwise
+                        ctx.save();
+                        ctx.translate(combinedCanvas.width, 0);
+                        ctx.rotate(Math.PI / 2);
+                        ctx.drawImage(originalImage, 0, 0);
+                        ctx.restore();
+
+                        // Rotate and draw the image 180 degrees clockwise
+                        ctx.save();
+                        ctx.translate(combinedCanvas.width, combinedCanvas.height);
+                        ctx.rotate(Math.PI);
+                        ctx.drawImage(originalImage, 0, 0);
+                        ctx.restore();
+
+                        // Rotate and draw the image 270 degrees clockwise
+                        ctx.save();
+                        ctx.translate(0, combinedCanvas.height);
+                        ctx.rotate(-Math.PI / 2);
+                        ctx.drawImage(originalImage, 0, 0);
+                        ctx.restore();
+                    };
+                    originalImage.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('saveButton').addEventListener('click', function() {
+            const combinedCanvas = document.getElementById('combinedCanvas');
+            const image = combinedCanvas.toDataURL("image/png");
+
+            const now = new Date();
+            const timestamp = now.getFullYear().toString() + 
+                              (now.getMonth() + 1).toString().padStart(2, '0') + 
+                              now.getDate().toString().padStart(2, '0') + '_' + 
+                              now.getHours().toString().padStart(2, '0') + 
+                              now.getMinutes().toString().padStart(2, '0') + 
+                              now.getSeconds().toString().padStart(2, '0') + 
+                              now.getMilliseconds().toString().padStart(3, '0');
+            const filename = `processed_image_${timestamp}.png`;
+
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = image;
+            link.click();
+        });
+    </script>
+</body>
+</html>
