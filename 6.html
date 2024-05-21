@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ImR5</title>
+    <style>
+    body, html {
+        margin: 0;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: Arial, sans-serif;
+        background-color: black; /* Set the background color to black */
+        color: white; /* Optional: Change text color to white for better visibility */
+    }
+    .container {
+        text-align: center;
+    }
+    #combinedCanvas {
+        border: 1px solid black;
+        max-width: 100%;
+        max-height: 100%;
+    }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <input type="file" id="imageInput" accept="image/*">
+        <button id="saveButton">Save Image</button>
+        <canvas id="combinedCanvas"></canvas>
+    </div>
+    <script>
+        document.getElementById('imageInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const originalImage = new Image();
+                    originalImage.onload = function() {
+                        const combinedCanvas = document.getElementById('combinedCanvas');
+                        const ctx = combinedCanvas.getContext('2d');
+
+                        const scaleFactor = 0.5; // Scale down the image by 50%
+                        combinedCanvas.width = originalImage.width * scaleFactor * 2;
+                        combinedCanvas.height = originalImage.height * scaleFactor * 2;
+
+                        // Draw and rotate the original image at different angles
+                        ctx.drawImage(originalImage, 0, 0, originalImage.width * scaleFactor, originalImage.height * scaleFactor);
+                        ctx.save();
+                        ctx.translate(combinedCanvas.width, 0);
+                        ctx.rotate(Math.PI / 2);
+                        ctx.drawImage(originalImage, 0, 0, originalImage.width * scaleFactor, originalImage.height * scaleFactor);
+                        ctx.restore();
+                        ctx.save();
+                        ctx.translate(combinedCanvas.width, combinedCanvas.height);
+                        ctx.rotate(Math.PI);
+                        ctx.drawImage(originalImage, 0, 0, originalImage.width * scaleFactor, originalImage.height * scaleFactor);
+                        ctx.restore();
+                        ctx.save();
+                        ctx.translate(0, combinedCanvas.height);
+                        ctx.rotate(-Math.PI / 2);
+                        ctx.drawImage(originalImage, 0, 0, originalImage.width * scaleFactor, originalImage.height * scaleFactor);
+                        ctx.restore();
+
+                        // Draw the tetragrammaton pentacle
+                        drawPentacle(ctx, combinedCanvas.width / 2, combinedCanvas.height / 2, Math.min(combinedCanvas.width, combinedCanvas.height) / 4);
+                    };
+                    originalImage.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('saveButton').addEventListener('click', function() {
+            const combinedCanvas = document.getElementById('combinedCanvas');
+            const quality = 0.6; // Adjust the quality setting for JPEG
+            const image = combinedCanvas.toDataURL("image/jpeg", quality);
+
+            const now = new Date();
+            const timestamp = now.getFullYear().toString() + 
+                              (now.getMonth() + 1).toString().padStart(2, '0') + 
+                              now.getDate().toString().padStart(2, '0') + '_' + 
+                              now.getHours().toString().padStart(2, '0') + 
+                              now.getMinutes().toString().padStart(2, '0') + 
+                              now.getSeconds().toString().padStart(2, '0') + 
+                              now.getMilliseconds().toString().padStart(3, '0');
+            const filename = `processed_image_${timestamp}.jpg`;
+
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = image;
+            link.click();
+        });
+
+        function drawPentacle(ctx, x, y, radius) {
+            const points = 5;
+            const step = Math.PI / points;
+
+            ctx.beginPath();
+            for (let i = 0; i < 2 * points + 1; i++) {
+                const angle = i * step;
+                const xPos = x + radius * Math.sin(angle);
+                const yPos = y - radius * Math.cos(angle);
+                ctx.lineTo(xPos, yPos);
+            }
+            ctx.closePath();
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+    </script>
+</body>
+</html>
